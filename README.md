@@ -1,4 +1,5 @@
 <div align="center">
+<img width="1200" height="475" alt="Gemini Air Piano Banner" src="./front-img.png" />
 
 # 🎹 Gemini Air Piano
 
