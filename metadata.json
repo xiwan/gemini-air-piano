@@ -1,0 +1,8 @@
+{
+  "name": "Gemini Air Piano",
+  "description": "A real-time Air Piano simulator. Virtual keys appear on screen, playable by tapping with fingers.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
