@@ -1,20 +1,153 @@
 <div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+<img width="1200" height="475" alt="Gemini Air Piano Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+
+# 🎹 Gemini Air Piano
+
+**用手势在空气中弹钢琴 — AI 驱动的虚拟乐器**
+
+[![React](https://img.shields.io/badge/React-19.2-61dafb?logo=react)](https://react.dev/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8-3178c6?logo=typescript)](https://www.typescriptlang.org/)
+[![MediaPipe](https://img.shields.io/badge/MediaPipe-Hands-00897b)](https://developers.google.com/mediapipe/solutions/vision/hand_landmarker)
+[![Gemini](https://img.shields.io/badge/Gemini_2.5-Flash-4285f4?logo=google)](https://ai.google.dev/)
+
+[Live Demo](https://ai.studio/apps/drive/1SrJjKmvR7a62-zazfq-MqVETKEfigVG6) · [Report Bug](https://github.com/xiwan/gemini-air-piano/issues) · [Request Feature](https://github.com/xiwan/gemini-air-piano/issues)
+
 </div>
 
-# Run and deploy your AI Studio app
+---
 
-This contains everything you need to run your app locally.
+## ✨ 功能特性
 
-View your app in AI Studio: https://ai.studio/apps/drive/1SrJjKmvR7a62-zazfq-MqVETKEfigVG6
+- 🖐️ **手势识别** — 基于 MediaPipe 实时追踪双手 21 个关键点，毫秒级响应
+- 🎵 **空气弹奏** — 弯曲手指即可触发对应琴键，无需任何物理设备
+- 🎼 **智能和弦** — Gemini 2.5 Flash 根据心情生成 Ukulele 和弦进行
+- 🔊 **Web Audio 合成** — 纯浏览器端音频引擎，三振荡器模拟真实钢琴音色
+- 🎬 **自动演奏** — 内置《小星星》《欢乐颂》《致爱丽丝》等经典曲目
+- 📱 **响应式设计** — 适配桌面和移动设备
 
-## Run Locally
+## 🎮 操作指南
 
-**Prerequisites:**  Node.js
+| 手指 | 左手 | 右手 |
+|------|------|------|
+| 无名指 | C4 | C5 |
+| 中指 | D4 | B4 |
+| 食指 | E4 | A4 |
+| 拇指 | F4 | G4 |
 
+**弹奏方式**：将手指弯曲（角度 < 160°）即可触发对应音符
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## 🚀 快速开始
+
+### 环境要求
+
+- Node.js 18+
+- 摄像头（用于手势识别）
+- 现代浏览器（Chrome/Edge/Firefox）
+
+### 安装运行
+
+```bash
+# 克隆仓库
+git clone https://github.com/xiwan/gemini-air-piano.git
+cd gemini-air-piano
+
+# 安装依赖
+npm install
+
+# 配置 API Key（可选，用于 AI 和弦生成）
+echo "API_KEY=your_gemini_api_key" > .env.local
+
+# 启动开发服务器
+npm run dev
+```
+
+打开浏览器访问 `http://localhost:5173`，点击 **INITIALIZE AI PIANO** 授权摄像头和音频。
+
+> 💡 **提示**：即使没有 Gemini API Key，项目也能正常运行，只是和弦生成会使用默认配置。
+
+## 🏗️ 技术架构
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        Browser                              │
+├─────────────────────────────────────────────────────────────┤
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────────┐  │
+│  │   Webcam    │───▶│  MediaPipe  │───▶│  AirPianoCanvas │  │
+│  │   Input     │    │   Hands     │    │   (React)       │  │
+│  └─────────────┘    └─────────────┘    └────────┬────────┘  │
+│                                                 │           │
+│                                                 ▼           │
+│  ┌─────────────┐    ┌─────────────┐    ┌─────────────────┐  │
+│  │   Gemini    │───▶│   Chord     │───▶│   AudioEngine   │  │
+│  │   2.5 Flash │    │   Service   │    │   (Web Audio)   │  │
+│  └─────────────┘    └─────────────┘    └─────────────────┘  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### 核心模块
+
+| 文件 | 职责 |
+|------|------|
+| `components/AirGuitarCanvas.tsx` | 手势识别主画布，处理手指弯曲检测与琴键映射 |
+| `components/Controls.tsx` | 控制面板，歌曲选择与自动播放 |
+| `services/audioEngine.ts` | Web Audio API 封装，三振荡器钢琴音色合成 |
+| `services/geminiService.ts` | Gemini API 集成，AI 和弦进行生成 |
+
+### 手指弯曲检测算法
+
+```typescript
+// 计算三点夹角判断手指是否弯曲
+function calculateAngle(a, b, c) {
+  const v1 = { x: a.x - b.x, y: a.y - b.y, z: a.z - b.z };
+  const v2 = { x: c.x - b.x, y: c.y - b.y, z: c.z - b.z };
+  // ... 向量点积计算
+  return angle; // < 160° 视为弯曲
+}
+```
+
+## 📦 依赖说明
+
+| 包名 | 用途 |
+|------|------|
+| `@mediapipe/hands` | 手部关键点检测 |
+| `@google/genai` | Gemini API 客户端 |
+| `react-webcam` | 摄像头组件封装 |
+| `lucide-react` | 图标库 |
+
+## 🛠️ 开发命令
+
+```bash
+npm run dev      # 启动开发服务器
+npm run build    # 生产构建
+npm run preview  # 预览生产构建
+```
+
+## 🤝 贡献指南
+
+欢迎提交 Issue 和 PR！
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/amazing-feature`)
+3. 提交更改 (`git commit -m 'Add amazing feature'`)
+4. 推送分支 (`git push origin feature/amazing-feature`)
+5. 发起 Pull Request
+
+## 📄 许可证
+
+本项目基于 MIT 许可证开源 — 详见 [LICENSE](LICENSE) 文件
+
+## 🙏 致谢
+
+- [Google AI Studio](https://ai.studio/) — 项目原型托管
+- [MediaPipe](https://developers.google.com/mediapipe) — 强大的 ML 视觉方案
+- [Gemini API](https://ai.google.dev/) — AI 和弦生成支持
+
+---
+
+<div align="center">
+
+**[⬆ 回到顶部](#-gemini-air-piano)**
+
+Made with ❤️ by [xiwan](https://github.com/xiwan)
+
+</div>
